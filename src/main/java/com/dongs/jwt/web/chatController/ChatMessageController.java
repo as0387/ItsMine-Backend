@@ -1,7 +1,7 @@
-package com.dongs.jwt.web.chat;
+package com.dongs.jwt.web.chatController;
 
 import com.dongs.jwt.dto.ChatMessageDto;
-import com.dongs.jwt.service.ChatMessageService;
+import com.dongs.jwt.service.chatService.ChatMessageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -19,5 +19,13 @@ public class ChatMessageController {
         chatMessageService.save(message);
         simpMessagingTemplate.convertAndSend("/topic/" + receiver,message);
     }
+
+    //@MessageMapping("/auction/send")
+//    public void sendMsg(ChatMessageDto message) throws Exception {
+//        System.out.println("샌드 메세지 실행");
+//        String receiver = message.getReceiver();
+//        chatMessageService.save(message);
+//        simpMessagingTemplate.convertAndSend("/topic/" + receiver,message);
+//    }
 
 }

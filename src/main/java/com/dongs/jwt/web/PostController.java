@@ -28,8 +28,8 @@ import com.dongs.jwt.domain.product.Post;
 import com.dongs.jwt.dto.PhotoDto;
 import com.dongs.jwt.dto.ReplySaveRequestDto;
 import com.dongs.jwt.dto.ResponseDto;
-import com.dongs.jwt.service.PhotoService;
-import com.dongs.jwt.service.PostService;
+import com.dongs.jwt.service.productService.PhotoService;
+import com.dongs.jwt.service.productService.PostService;
 
 import lombok.RequiredArgsConstructor;
 

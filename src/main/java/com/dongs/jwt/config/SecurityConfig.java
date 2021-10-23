@@ -16,6 +16,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.context.SecurityContextPersistenceFilter;
+import org.springframework.security.web.header.writers.StaticHeadersWriter;
 import org.springframework.web.filter.CorsFilter;
 
 import com.dongs.jwt.config.filter.MyCorsFilter;
@@ -53,8 +54,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 				.addFilterAfter(new JwtAuthenticationFilter(authenticationManager()),
 						UsernamePasswordAuthenticationFilter.class)// AythenticationManager
 				.addFilter(new JwtAuthorizationFilter(authenticationManager(), userRepository))// AythenticationManager
-				.authorizeRequests().antMatchers("/post/**","/user-**", "/t-history/**","/bidPost/**").access("hasRole('ROLE_USER')").anyRequest().permitAll();
-//				.and()
+				.authorizeRequests().antMatchers("/post/**","/user-**", "/t-history/**","/bidPost/**").access("hasRole('ROLE_USER')").anyRequest().permitAll()
+				.and()
+				.headers().frameOptions().sameOrigin();
 //				.oauth2Login()
 //				.userInfoEndpoint()
 //				.userService(principalOauth2UserService);

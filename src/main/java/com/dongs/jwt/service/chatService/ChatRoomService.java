@@ -1,8 +1,8 @@
-package com.dongs.jwt.service;
+package com.dongs.jwt.service.chatService;
 
 import com.dongs.jwt.domain.chat.ChatRoom;
-import com.dongs.jwt.repository.ChatRoomJoinRepository;
-import com.dongs.jwt.repository.ChatRoomRepository;
+import com.dongs.jwt.repository.chat.ChatRoomJoinRepository;
+import com.dongs.jwt.repository.chat.ChatRoomRepository;
 import com.dongs.jwt.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

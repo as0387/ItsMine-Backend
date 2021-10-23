@@ -1,4 +1,4 @@
-package com.dongs.jwt.service;
+package com.dongs.jwt.service.userService;
 
 import javax.servlet.http.HttpSession;
 import javax.transaction.Transactional;

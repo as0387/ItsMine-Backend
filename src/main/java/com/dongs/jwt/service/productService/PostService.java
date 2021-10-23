@@ -1,4 +1,4 @@
-package com.dongs.jwt.service;
+package com.dongs.jwt.service.productService;
 
 import java.util.ArrayList;
 import java.util.List;

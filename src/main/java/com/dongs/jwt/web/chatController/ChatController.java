@@ -1,12 +1,12 @@
-package com.dongs.jwt.web.chat;
+package com.dongs.jwt.web.chatController;
 
 import com.dongs.jwt.config.auth.PrincipalDetails;
 import com.dongs.jwt.domain.chat.ChatRoom;
 import com.dongs.jwt.domain.user.User;
 import com.dongs.jwt.dto.ChatListDto;
-import com.dongs.jwt.service.ChatMessageService;
-import com.dongs.jwt.service.ChatRoomJoinService;
-import com.dongs.jwt.service.ChatRoomService;
+import com.dongs.jwt.service.chatService.ChatMessageService;
+import com.dongs.jwt.service.chatService.ChatRoomJoinService;
+import com.dongs.jwt.service.chatService.ChatRoomService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

@@ -1,23 +1,12 @@
 package com.dongs.jwt.config.filter;
 
 import java.io.IOException;
-import java.util.Date;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletResponse;
-
-import org.springframework.context.annotation.Bean;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.web.filter.CorsFilter;
-
-import com.dongs.jwt.config.jwt.JwtProps;
-import com.dongs.jwt.domain.product.NomalAuctionPost;
-import com.dongs.jwt.repository.NomalAuctionPostRepository;
 
 public class MyCorsFilter2 implements Filter{
 

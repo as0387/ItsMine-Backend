@@ -1,4 +1,4 @@
-package com.dongs.jwt.repository;
+package com.dongs.jwt.repository.chat;
 
 import com.dongs.jwt.domain.chat.ChatRoom;
 
