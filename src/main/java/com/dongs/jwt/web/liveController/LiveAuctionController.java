@@ -1,51 +1,77 @@
 package com.dongs.jwt.web.liveController;
 
-import com.dongs.jwt.domain.chat.ChatRoom;
+import com.dongs.jwt.config.auth.PrincipalDetails;
 import com.dongs.jwt.domain.liveAuction.LiveAuctionPost;
-import com.dongs.jwt.service.liveAuctionService.LiveChatMessageService;
-import com.dongs.jwt.service.liveAuctionService.LiveAuctionPostJoinService;
+import com.dongs.jwt.domain.product.Post;
+import com.dongs.jwt.domain.user.User;
+import com.dongs.jwt.dto.ChatListDto;
 import com.dongs.jwt.service.liveAuctionService.LiveAuctionPostService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
 public class LiveAuctionController {
 
-    private final LiveAuctionPostJoinService liveAuctionPostJoinService;
     private final LiveAuctionPostService liveAuctionPostService;
-    private final LiveChatMessageService liveChatMessageService;
 
-//    @GetMapping("/chat-list")
-//    public ResponseEntity<?> chatList(@AuthenticationPrincipal PrincipalDetails principal){
-//        User user = principal.getUser();
-//        List<ChatListDto> list = chatRoomJoinService.getChatRoomList(user);
-//        return new ResponseEntity<List<ChatListDto>>(list, HttpStatus.OK);
-//    }
-
-    @PostMapping("/chat/newChat")
-    public ResponseEntity<?> createChatRoom(@RequestBody Map<String, Integer> roomUserInfo){
-        int userId1 = roomUserInfo.get("userId1");
-        int userId2 =roomUserInfo.get("userId2");
-        return new ResponseEntity<Long>(liveAuctionPostJoinService.createChatRoom(userId1,userId2), HttpStatus.OK);
+    //라이브 경매 리스트 요청
+    @GetMapping("/live-auction/list")
+    public ResponseEntity<?> home(
+            @PageableDefault(size = 30, sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {// 페이징 안할거면 지우던가
+        return new ResponseEntity<Page<LiveAuctionPost>>(liveAuctionPostService.라이브경매목록(pageable), HttpStatus.OK);
     }
 
-    @GetMapping("/chat/{chatRoomId}")
-    public ResponseEntity<?> openChatRoom(@PathVariable int chatRoomId){
-        return new ResponseEntity<LiveAuctionPost>(liveAuctionPostService.openChatRoom(chatRoomId), HttpStatus.OK);
+    //라이브 경매 업로드 요청
+    @PostMapping("/live-auction/new")
+    public ResponseEntity<?> createLiveAuction(@RequestPart("live-auction-post") LiveAuctionPost liveAuctionPost,
+                                            @RequestPart("photo") Map<String, Object> photoList,
+                                            @AuthenticationPrincipal PrincipalDetails principal){
+
+        return new ResponseEntity<Integer>( liveAuctionPostService.라이브경매상품등록(liveAuctionPost, photoList, principal.getUser()), HttpStatus.OK);
     }
 
-//    @PostMapping("/chat")
-//    public ResponseEntity<?> sendMessage(@RequestBody Map<String, Object> messageInfo){
-//        int writerId = (int)messageInfo.get("writerId");
-//        Long roomId = Long.valueOf(String.valueOf(messageInfo.get("roomId")));
-//        String message = (String)messageInfo.get("message");
-//        chatMessageService.sendMessage(writerId,roomId,message);
-//        return new ResponseEntity<String>("ok", HttpStatus.OK);
-//    }
+    //라이브 경매 상세페이지요청
+    @GetMapping("/live-auction/detail/{liveAuctionPostId}")
+    public ResponseEntity<?> openLiveAuctionPost(@PathVariable int liveAuctionPostId){
+        return new ResponseEntity<LiveAuctionPost>(liveAuctionPostService.openLiveAuctionPost(liveAuctionPostId), HttpStatus.OK);
+    }
+
+    //라이브 경매 시작 요청
+    @GetMapping("/live-auction/start/{liveAuctionPostId}")
+    public ResponseEntity<?> startLiveAuction(@PathVariable int liveAuctionPostId,@AuthenticationPrincipal PrincipalDetails principal){
+        User user = principal.getUser();
+        String result = liveAuctionPostService.라이브경매시작(liveAuctionPostId, user);
+        if(result != "ok"){
+            if(result != "Not Same User"){
+                return new ResponseEntity<String>("게시물 작성자가 아닙니다.", HttpStatus.FORBIDDEN);
+            }
+            return new ResponseEntity<String>("이미시작한경매", HttpStatus.FORBIDDEN);
+        }
+        return new ResponseEntity<String>("ok", HttpStatus.OK);
+    }
+
+    //라이브 경매 종료 요청
+    @GetMapping("/live-auction/end/{liveAuctionPostId}")
+    public ResponseEntity<?> endLiveAuction(@PathVariable int liveAuctionPostId,@AuthenticationPrincipal PrincipalDetails principal){
+        LiveAuctionPost post  = liveAuctionPostService.openLiveAuctionPost(liveAuctionPostId);
+        if(post.getEndType() != 0){
+            if(post.getUser().getId() != principal.getUser().getId()){
+                return new ResponseEntity<String>("게시물 작성자가 아닙니다.", HttpStatus.FORBIDDEN);
+            }
+            return new ResponseEntity<String>("이미 종료한경매", HttpStatus.FORBIDDEN);
+        }
+        return new ResponseEntity<User>(liveAuctionPostService.라이브경매종료(post), HttpStatus.OK);
+    }
 
 }

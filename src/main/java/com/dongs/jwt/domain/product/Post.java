@@ -78,6 +78,7 @@ public class Post {
 	@OneToMany(mappedBy = "post", fetch = FetchType.EAGER, cascade = CascadeType.REMOVE)//하나의 게시글에는 여러개의 댓글이 달릴수있음 ,
 	@JsonIgnoreProperties({"post"})													//mappedBy 연관관계의 주인이아니다라는 의미를 가짐  DB에 칼럼을 만들지마세요!, ""안의 값은 reply의 프로퍼티명을 써주면된다.
 	@OrderBy("id desc")																	//CascadeType.REMOVE board 지울때 reply도 다날림.
+	@Column(nullable = false)
 	private List<Photo> photos;
 	
 	@OneToMany(mappedBy = "post2", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)//하나의 게시글에는 여러개의 댓글이 달릴수있음 ,

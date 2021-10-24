@@ -13,8 +13,6 @@ public class MyCorsFilter2 implements Filter{
 	@Override
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
 			throws IOException, ServletException {
-		NomalAuctionPostRepository n;
-		
 		//앤드타입으로 구분해서 타입이 1일경우 경매 시퀀스 실행해줌
 		//n.findById(1);//실행안된 게시물 찾아서
 		

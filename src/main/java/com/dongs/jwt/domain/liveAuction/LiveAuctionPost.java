@@ -7,20 +7,13 @@ import java.util.List;
 
 import javax.persistence.*;
 
-import com.dongs.jwt.domain.chat.ChatMessage;
 import com.dongs.jwt.domain.product.Photo;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import org.hibernate.annotations.ColumnDefault;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import com.dongs.jwt.domain.user.User;
-
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
 @Entity
 @Data
@@ -42,32 +35,35 @@ public class LiveAuctionPost {
 	@JoinColumn(name = "user_id")
 	@ManyToOne
 	private User user;
-	
-	@Column(columnDefinition = "int default 1")
-	private int type;
-	
-	@Column(columnDefinition = "int default 1")
+
+	@Column(columnDefinition = "integer default 0")
+	private int startType;
+
+	@Column(columnDefinition = "integer default 0")
 	private int endType;
 	 
 	 @Column
 	 private int bid;
 	 private int bidderId;
-	 private int bidLimit;
 	 private int endTime;
+
+	@Column(columnDefinition = "integer default 0")
+	 private int bidEntryCount;
 	 
 	@JoinColumn(name = "bidder")
 	@ManyToOne
 	 private User bidder;
 
-	@OneToMany(mappedBy = "post", fetch = FetchType.EAGER, cascade = CascadeType.REMOVE)//하나의 게시글에는 여러개의 댓글이 달릴수있음 ,
-	@JsonIgnoreProperties({"post"})													//mappedBy 연관관계의 주인이아니다라는 의미를 가짐  DB에 칼럼을 만들지마세요!, ""안의 값은 reply의 프로퍼티명을 써주면된다.
+	@OneToMany(mappedBy = "liveAuctionPost", fetch = FetchType.EAGER, cascade = CascadeType.REMOVE)//하나의 게시글에는 여러개의 댓글이 달릴수있음 ,
+	@JsonIgnoreProperties({"liveAuctionPost"})													//mappedBy 연관관계의 주인이아니다라는 의미를 가짐  DB에 칼럼을 만들지마세요!, ""안의 값은 reply의 프로퍼티명을 써주면된다.
 	@OrderBy("id desc")																	//CascadeType.REMOVE board 지울때 reply도 다날림.
-	private List<Photo> photos;
+	@Column(nullable = false)
+	private List<Photo> livePhotos;
 
-	@OneToMany(mappedBy = "liveAuctionPost",fetch = FetchType.EAGER, cascade = CascadeType.REMOVE)
+	@OneToMany(mappedBy = "liveAuctionPost",fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
 	@JsonIgnoreProperties({"liveAuctionPost"})
 	@OrderBy("id desc")
-	private List<ChatMessage> messages = new ArrayList<>();
+	private List<LiveChatMessage> messages = new ArrayList<>();
 	 
 	@CreationTimestamp
 	private Timestamp createDate;

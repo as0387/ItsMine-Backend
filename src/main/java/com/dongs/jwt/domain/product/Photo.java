@@ -9,6 +9,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import com.dongs.jwt.domain.liveAuction.LiveAuctionPost;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Data;
@@ -37,6 +38,10 @@ public class Photo {
     @JoinColumn(name = "postId")
     @ManyToOne
     private Post post;
+
+    @JoinColumn(name = "LP_Id")
+    @ManyToOne
+    private LiveAuctionPost liveAuctionPost;
 
 
     @Builder

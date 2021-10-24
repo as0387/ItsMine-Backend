@@ -24,16 +24,16 @@ public class LiveChatMessage {
 
     @ManyToOne
     @JoinColumn(name = "LP_id")
-    private LiveAuctionPost LA_post;
+    private LiveAuctionPost liveAuctionPost;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User writer;
 
-    public LiveChatMessage(String message, LocalDateTime time, LiveAuctionPost LA_post, User writer){
+    public LiveChatMessage(String message, LocalDateTime time, LiveAuctionPost liveAuctionPost, User writer){
         this.message=message;
         this.time=time;
-        this.LA_post=LA_post;
+        this.liveAuctionPost=liveAuctionPost;
         this.writer=writer;
     }
 }

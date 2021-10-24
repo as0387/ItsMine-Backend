@@ -22,7 +22,6 @@ public class ChatController {
 
     private final ChatRoomJoinService chatRoomJoinService;
     private final ChatRoomService chatRoomService;
-    private final ChatMessageService chatMessageService;
 
     @GetMapping("/chat-list")
     public ResponseEntity<?> chatList(@AuthenticationPrincipal PrincipalDetails principal){
