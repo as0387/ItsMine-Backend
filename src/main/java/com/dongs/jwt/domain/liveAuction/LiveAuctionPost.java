@@ -44,13 +44,14 @@ public class LiveAuctionPost {
 	 
 	 @Column
 	 private int bid;
-	 private int bidderId;
 	 private int endTime;
+	@Column
+	private int minBidUnit;
 
 	@Column(columnDefinition = "integer default 0")
 	 private int bidEntryCount;
 	 
-	@JoinColumn(name = "bidder")
+	@JoinColumn(name = "bidder_id")
 	@ManyToOne
 	 private User bidder;
 

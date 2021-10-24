@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicLong;
 
 @Service
 @RequiredArgsConstructor
@@ -66,16 +67,17 @@ public class LiveAuctionPostService {
         return 0;
     }
 
-    @Transactional
-    public int 라이브경매입찰하기(LiveBidMessageDto message, User principal) {
-        LiveAuctionPost postEntity = liveAuctionPostRepository.findById(message.getLivePostId()).orElseThrow(() -> new IllegalArgumentException(message.getLivePostId() + "는 존재하지 않습니다."));
-
+    @Transactional //동시성 제어
+     synchronized public String 라이브경매입찰하기(LiveAuctionPost postEntity, int price, User principal) {
         if (postEntity.getUser().getId() != principal.getId()) {
-            postEntity.setBid(message.getPrice());
-            postEntity.setBidder(principal);
-            return 1;
+            if(postEntity.getBid() < price){
+                postEntity.setBid(price);
+                postEntity.setBidder(principal);
+                return "ok";
+            }
+            return "low";
         } else {
-            return 0;
+            return "same";
         }
     }
 
@@ -86,6 +88,8 @@ public class LiveAuctionPostService {
             return "fail";
         }else if(postEntity.getUser().getId() != principal.getId()){
             return "Not Same User";
+        }else if(postEntity.getBidEntryCount() <= 0){
+            return "No Bid Entry";
         }
         postEntity.setStartType(1);
         return "ok";

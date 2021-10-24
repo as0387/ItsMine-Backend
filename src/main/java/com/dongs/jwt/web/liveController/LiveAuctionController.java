@@ -5,6 +5,7 @@ import com.dongs.jwt.domain.liveAuction.LiveAuctionPost;
 import com.dongs.jwt.domain.product.Post;
 import com.dongs.jwt.domain.user.User;
 import com.dongs.jwt.dto.ChatListDto;
+import com.dongs.jwt.dto.LiveBidMessageDto;
 import com.dongs.jwt.service.liveAuctionService.LiveAuctionPostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -13,9 +14,11 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -52,9 +55,11 @@ public class LiveAuctionController {
     public ResponseEntity<?> startLiveAuction(@PathVariable int liveAuctionPostId,@AuthenticationPrincipal PrincipalDetails principal){
         User user = principal.getUser();
         String result = liveAuctionPostService.라이브경매시작(liveAuctionPostId, user);
-        if(result != "ok"){
-            if(result != "Not Same User"){
+        if(!result.equals("ok")){
+            if(result.equals("Not Same User")){
                 return new ResponseEntity<String>("게시물 작성자가 아닙니다.", HttpStatus.FORBIDDEN);
+            }else if(result.equals("No Bid Entry")){
+                return new ResponseEntity<String>("아직 경매참여인원이 없습니다.", HttpStatus.FORBIDDEN);
             }
             return new ResponseEntity<String>("이미시작한경매", HttpStatus.FORBIDDEN);
         }
@@ -72,6 +77,22 @@ public class LiveAuctionController {
             return new ResponseEntity<String>("이미 종료한경매", HttpStatus.FORBIDDEN);
         }
         return new ResponseEntity<User>(liveAuctionPostService.라이브경매종료(post), HttpStatus.OK);
+    }
+
+    @PostMapping("/live-auction/bidding/{liveAuctionPostId}") //여기서 경매 입찰 처리
+    public ResponseEntity<?> biding(@RequestBody HashMap<String, Integer> map,
+                                    @PathVariable int liveAuctionPostId,
+                                    @AuthenticationPrincipal PrincipalDetails principal) throws Exception {
+        System.out.println("라이브 입찰  실행");
+        int price = map.get("price");
+        LiveAuctionPost post =  liveAuctionPostService.openLiveAuctionPost(liveAuctionPostId);
+        String result = liveAuctionPostService.라이브경매입찰하기(post, price, principal.getUser());
+        if(result.equals("low")){
+            return new ResponseEntity<String>(result, HttpStatus.FORBIDDEN);
+        }else if(result.equals("same")){
+            return new ResponseEntity<String>(result, HttpStatus.FORBIDDEN);
+        }
+        return new ResponseEntity<String>(result, HttpStatus.OK);
     }
 
 }

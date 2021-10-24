@@ -64,7 +64,8 @@ public class PostController {
 
 	@PostMapping("/nomalAuctionPost")
 	public ResponseEntity<?> auctionSave(@RequestPart("post1") Post post,
-			@RequestPart("post2") Map<String, Object> photoList, @AuthenticationPrincipal PrincipalDetails principal) {
+										 @RequestPart("post2") Map<String, Object> photoList,
+										 @AuthenticationPrincipal PrincipalDetails principal) {
 		System.out.println(photoList.get("fileIdList").getClass().getName());
 		postService.일반경매상품등록(post, photoList, principal.getUser());
 		return new ResponseEntity<String>("ok", HttpStatus.CREATED);
