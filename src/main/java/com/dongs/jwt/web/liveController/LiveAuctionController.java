@@ -28,11 +28,18 @@ public class LiveAuctionController {
 
     private final LiveAuctionPostService liveAuctionPostService;
 
+
+
     //라이브 경매 리스트 요청
     @GetMapping("/live-auction/list")
     public ResponseEntity<?> home(
             @PageableDefault(size = 30, sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {// 페이징 안할거면 지우던가
         return new ResponseEntity<Page<LiveAuctionPost>>(liveAuctionPostService.라이브경매목록(pageable), HttpStatus.OK);
+    }
+    //라이브 경매 리스트 요청
+    @GetMapping("/live-auction/my-list")
+    public ResponseEntity<?> myList(@AuthenticationPrincipal PrincipalDetails principal) {// 페이징 안할거면 지우던가
+        return new ResponseEntity<List<LiveAuctionPost>>(liveAuctionPostService.나의라이브경매목록(principal.getUser().getId()), HttpStatus.OK);
     }
 
     //라이브 경매 업로드 요청
@@ -72,27 +79,27 @@ public class LiveAuctionController {
         LiveAuctionPost post  = liveAuctionPostService.openLiveAuctionPost(liveAuctionPostId);
         if(post.getEndType() != 0){
             if(post.getUser().getId() != principal.getUser().getId()){
-                return new ResponseEntity<String>("게시물 작성자가 아닙니다.", HttpStatus.FORBIDDEN);
+                return new ResponseEntity<String>("게시물 작성자가 아닙니다.", HttpStatus.OK);
             }
-            return new ResponseEntity<String>("이미 종료한경매", HttpStatus.FORBIDDEN);
+            return new ResponseEntity<String>("이미 종료한경매", HttpStatus.OK);
         }
         return new ResponseEntity<User>(liveAuctionPostService.라이브경매종료(post), HttpStatus.OK);
     }
 
-    @PostMapping("/live-auction/bidding/{liveAuctionPostId}") //여기서 경매 입찰 처리
-    public ResponseEntity<?> biding(@RequestBody HashMap<String, Integer> map,
-                                    @PathVariable int liveAuctionPostId,
-                                    @AuthenticationPrincipal PrincipalDetails principal) throws Exception {
-        System.out.println("라이브 입찰  실행");
-        int price = map.get("price");
-        LiveAuctionPost post =  liveAuctionPostService.openLiveAuctionPost(liveAuctionPostId);
-        String result = liveAuctionPostService.라이브경매입찰하기(post, price, principal.getUser());
-        if(result.equals("low")){
-            return new ResponseEntity<String>(result, HttpStatus.FORBIDDEN);
-        }else if(result.equals("same")){
-            return new ResponseEntity<String>(result, HttpStatus.FORBIDDEN);
-        }
-        return new ResponseEntity<String>(result, HttpStatus.OK);
-    }
+//    @PostMapping("/live-auction/bidding/{liveAuctionPostId}") //여기서 경매 입찰 처리
+//    public ResponseEntity<?> biding(@RequestBody HashMap<String, Integer> map,
+//                                    @PathVariable int liveAuctionPostId,
+//                                    @AuthenticationPrincipal PrincipalDetails principal) throws Exception {
+//        System.out.println("라이브 입찰  실행");
+//        int price = map.get("price");
+//        LiveAuctionPost post =  liveAuctionPostService.openLiveAuctionPost(liveAuctionPostId);
+//        String result = liveAuctionPostService.라이브경매입찰하기(post, price, principal.getUser());
+//        if(result.equals("low")){
+//            return new ResponseEntity<String>(result, HttpStatus.FORBIDDEN);
+//        }else if(result.equals("same")){
+//            return new ResponseEntity<String>(result, HttpStatus.FORBIDDEN);
+//        }
+//        return new ResponseEntity<String>(result, HttpStatus.OK);
+//    }
 
 }

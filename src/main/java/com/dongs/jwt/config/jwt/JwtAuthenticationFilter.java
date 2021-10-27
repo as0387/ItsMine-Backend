@@ -35,7 +35,6 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 	@Override
 	public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response)
 			throws AuthenticationException {
-		System.out.println("JwtAuthenticationFilter 작동");
 		try {
 
 			ObjectMapper om = new ObjectMapper();
@@ -61,7 +60,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 	@Override
 	protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain,
 			Authentication authResult) throws IOException, ServletException {
-		System.out.println("successfulAuthentication 실행됨 : 인증이 완료되었다는 뜻임");
+//		System.out.println("successfulAuthentication 실행됨 : 인증이 완료되었다는 뜻임");
 		PrincipalDetails principalDetails = (PrincipalDetails)authResult.getPrincipal();
 		System.out.println(principalDetails.getUser().getUsername());
 		PrintWriter out = response.getWriter();

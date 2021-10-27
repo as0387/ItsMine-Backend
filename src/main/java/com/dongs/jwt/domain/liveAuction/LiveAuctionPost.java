@@ -42,9 +42,9 @@ public class LiveAuctionPost {
 	@Column(columnDefinition = "integer default 0")
 	private int endType;
 	 
-	 @Column
-	 private int bid;
-	 private int endTime;
+	@Column
+	private int bid;
+
 	@Column
 	private int minBidUnit;
 
@@ -65,11 +65,11 @@ public class LiveAuctionPost {
 	@JsonIgnoreProperties({"liveAuctionPost"})
 	@OrderBy("id desc")
 	private List<LiveChatMessage> messages = new ArrayList<>();
-	 
+
 	@CreationTimestamp
 	private Timestamp createDate;
 	
-	@LastModifiedDate
-    private LocalDateTime modifiedDate;
+	@Column
+    private LocalDateTime auctionStartDate;
 
 }

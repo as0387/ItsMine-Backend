@@ -2,7 +2,12 @@ server:
   port: 8000
   servlet:
     context-path: /
-    
+#  ssl:
+#    key-store: C:/Program Files/Java/jdk-15.0.1/bin/keystore_test.p12
+#    key-store-type: PKCS12
+#    key-alias: key_test
+#    key-store-password: 123456
+
 spring:     
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver

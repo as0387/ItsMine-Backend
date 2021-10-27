@@ -2,8 +2,10 @@ package com.dongs.jwt.web.liveController;
 
 import com.dongs.jwt.config.auth.PrincipalDetails;
 import com.dongs.jwt.domain.liveAuction.LiveAuctionPost;
+import com.dongs.jwt.domain.user.User;
 import com.dongs.jwt.dto.LiveBidMessageDto;
 import com.dongs.jwt.dto.LiveChatMessageDto;
+import com.dongs.jwt.repository.UserRepository;
 import com.dongs.jwt.service.liveAuctionService.LiveAuctionPostService;
 import com.dongs.jwt.service.liveAuctionService.LiveChatMessageService;
 import lombok.RequiredArgsConstructor;
@@ -34,33 +36,36 @@ public class LiveAuctionMessageController {
         simpMessagingTemplate.convertAndSend("/topic/" + liveAuctionPostId, message);
     }
 
-    //전광판에 경매 정보 요청
-    @MessageMapping("/live/bidInfo/send")
-    public void bidInfo(LiveBidMessageDto message) throws Exception {
-        System.out.println("라이브 경매 전광판 샌드 메세지 실행");
-        int liveAuctionPostId = message.getLivePostId();
-        LiveAuctionPost post = liveAuctionPostService.openLiveAuctionPost(liveAuctionPostId);
-        message.setBidder(post.getBidder().getNickname());
-        message.setPrice(post.getBid());
-        simpMessagingTemplate.convertAndSend("/topic/bidInfo/" + liveAuctionPostId, message);
-    }
+//    //전광판에 경매 정보 요청
+//    @MessageMapping("/live/bidInfo/send")
+//    public void bidInfo(LiveBidMessageDto message) throws Exception {
+//        System.out.println("라이브 경매 전광판 샌드 메세지 실행");
+//        int liveAuctionPostId = message.getLivePostId();
+//        LiveAuctionPost post = liveAuctionPostService.openLiveAuctionPost(liveAuctionPostId);
+//        message.setBidder(post.getBidder().getNickname());
+//        message.setPrice(post.getBid());
+//        simpMessagingTemplate.convertAndSend("/topic/bidInfo/" + liveAuctionPostId, message);
+//    }
 
     @MessageMapping("/live/bidding/send") //여기서 경매 입찰 처리
-    public ResponseEntity<?> biding(@RequestBody HashMap<String, Integer> map,
-                                    @AuthenticationPrincipal PrincipalDetails principal) throws Exception {
-        System.out.println("라이브 입찰 샌드 메세지 실행");
-        int price = map.get("price");
-        int liveAuctionPostId = map.get("liveAuctionPostId");
-        LiveAuctionPost post =  liveAuctionPostService.openLiveAuctionPost(liveAuctionPostId);
-        String result = liveAuctionPostService.라이브경매입찰하기(post, price, principal.getUser());
-        if(result.equals("low")){
-            return new ResponseEntity<String>(result, HttpStatus.FORBIDDEN);
-        }else if(result.equals("same")){
-            return new ResponseEntity<String>(result, HttpStatus.FORBIDDEN);
+    public void biding(@RequestBody HashMap<String, Object> map) throws Exception {
+        int price = (int)map.get("price");
+        int liveAuctionPostId = (int)map.get("livePostId");
+        int principalId = (int)map.get("sender");
+        LiveChatMessageDto result = liveAuctionPostService.라이브경매입찰하기(liveAuctionPostId, price, principalId);
+        switch (result.getMessage()) {
+            case "low":
+            case "again":
+            case "same":
+                simpMessagingTemplate.convertAndSend("/topic/log/" + liveAuctionPostId, result);
+                break;
+            default:
+                LiveAuctionPost post = liveAuctionPostService.openLiveAuctionPost(liveAuctionPostId);
+                result.setMessage(post.getBidder().getNickname() + "님이" + post.getBid() + "원에 입찰하셨습니다!");
+                simpMessagingTemplate.convertAndSend("/topic/log/" + liveAuctionPostId, result);
+                break;
         }
-        String message = post.getBidder()+ "님이" + post.getBid() + "원에 입찰하셨습니다!";
-        simpMessagingTemplate.convertAndSend("/topic/log/" + liveAuctionPostId, message);
-        return new ResponseEntity<String>(result, HttpStatus.OK);
+
     }
 
     //입장
@@ -68,8 +73,7 @@ public class LiveAuctionMessageController {
     public void inRoom(LiveChatMessageDto message) throws Exception {
         System.out.println("라이브 경매 입장 샌드 메세지 실행");
         int liveAuctionPostId = message.getLivePostId();
-        LiveAuctionPost post = liveAuctionPostService.openLiveAuctionPost(liveAuctionPostId);
-        post.setBidEntryCount(post.getBidEntryCount() + 1);
+        liveAuctionPostService.라이브경매입장(liveAuctionPostId);
         simpMessagingTemplate.convertAndSend("/topic/in/" + liveAuctionPostId, message);
     }
 
@@ -78,10 +82,7 @@ public class LiveAuctionMessageController {
     public void outRoom(LiveChatMessageDto message) throws Exception {
         System.out.println("라이브 경매 퇴장 샌드 메세지 실행");
         int liveAuctionPostId = message.getLivePostId();
-        LiveAuctionPost post = liveAuctionPostService.openLiveAuctionPost(liveAuctionPostId);
-        if (post.getBidEntryCount() > 0) {
-            post.setBidEntryCount(post.getBidEntryCount() - 1);
-        }
+        liveAuctionPostService.라이브경매퇴장(liveAuctionPostId);
         simpMessagingTemplate.convertAndSend("/topic/out/" + liveAuctionPostId, message);
     }
 }
