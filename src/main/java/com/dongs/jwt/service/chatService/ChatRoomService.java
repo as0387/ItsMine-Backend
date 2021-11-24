@@ -17,7 +17,6 @@ public class ChatRoomService {
     private final ChatRoomJoinRepository chatRoomJoinRepository;
     private final ChatRoomRepository chatRoomRepository;
 
-
     @Transactional
     public ChatRoom openChatRoom(Long chatRoomId) {//1:1채팅
         return chatRoomRepository.findById(chatRoomId).orElseThrow(() -> new IllegalArgumentException(chatRoomId + "는 존재하지 않습니다."));

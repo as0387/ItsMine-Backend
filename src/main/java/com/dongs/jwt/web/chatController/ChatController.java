@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -29,7 +30,6 @@ public class ChatController {
         List<ChatListDto> list = chatRoomJoinService.getChatRoomList(user);
         return new ResponseEntity<List<ChatListDto>>(list, HttpStatus.OK);
     }
-
     @PostMapping("/chat/newChat")
     public ResponseEntity<?> createChatRoom(@RequestBody Map<String, Integer> roomUserInfo){
         int userId1 = roomUserInfo.get("userId1");
